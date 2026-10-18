@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
@@ -152,12 +153,7 @@ public class TelegramSend extends AbstractTelegramConnection {
         try (HttpClient httpClient = new HttpClient(runContext, super.httpClientConfigurationWithOptions())) {
             String rDestination = runContext.render(this.channel).as(String.class).orElseThrow();
             String rApiToken = runContext.render(this.token).as(String.class).orElseThrow();
-            String rParseMode = this.parseMode != null
-                ? Optional.ofNullable(runContext.render(this.parseMode.toString()))
-                    .map(ParseMode::fromString)
-                    .map(ParseMode::getValue)
-                    .orElse(null)
-                : null;
+            String rParseMode = renderParseMode(runContext).map(ParseMode::getValue).orElse(null);
             if (this.from != null) {
                 var rFrom = runContext.render(this.from).as(String.class)
                     .filter(value -> !value.isBlank())
@@ -195,6 +191,12 @@ public class TelegramSend extends AbstractTelegramConnection {
         }
 
         return null;
+    }
+
+    protected Optional<ParseMode> renderParseMode(RunContext runContext) throws IllegalVariableEvaluationException {
+        return this.parseMode != null
+            ? Optional.ofNullable(runContext.render(this.parseMode.toString())).map(ParseMode::fromString)
+            : Optional.empty();
     }
 
     public enum ParseMode {

@@ -1,0 +1,5 @@
+id: parse-mode-markdownv2-source
+namespace: io.kestra.tests
+tasks:
+  - id: failed_step
+    type: io.kestra.plugin.core.execution.Fail

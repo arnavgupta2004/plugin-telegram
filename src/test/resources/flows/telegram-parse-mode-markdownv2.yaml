@@ -1,0 +1,22 @@
+id: telegram-parse-mode-markdownv2
+namespace: io.kestra.tests
+
+tasks:
+  - id: telegram
+    type: io.kestra.plugin.telegram.TelegramExecution
+    endpointOverride: "http://localhost:59443"
+    channel: "channel"
+    token: "token"
+    parseMode: MARKDOWNV2
+    executionId: "{{trigger.executionId}}"
+    customMessage: 'Disk <90% & "almost" full (v1.2)!'
+
+triggers:
+  - id: on_failure
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: io.kestra.tests
+          flowId: parse-mode-markdownv2-source
+          states: [ FAILED ]

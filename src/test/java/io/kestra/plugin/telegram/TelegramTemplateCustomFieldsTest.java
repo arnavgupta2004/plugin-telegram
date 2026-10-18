@@ -19,19 +19,19 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 /**
- * Renders telegram-template.peb directly. The rendered template, quotes included, is sent as the message
- * text, which Telegram limits to 4096 characters.
+ * Renders telegram-template.peb directly. The rendered template is sent as the message text, which Telegram
+ * limits to 4096 characters.
  */
 @KestraTest
 class TelegramTemplateCustomFieldsTest {
-    private static final String BASE = "\"<company.team flow exec-id ➛ FAILED - Final task ID ➛ failed> Failed on task `failed` after PT1S (https://kestra.example/link)";
+    private static final String BASE = "<company.team flow exec-id ➛ FAILED - Final task ID ➛ failed> Failed on task `failed` after PT1S (https://kestra.example/link)";
 
     @Inject
     private RunContextFactory runContextFactory;
 
     @Test
     void withoutCustomMessageOrFields_messageIsUnchanged() throws Exception {
-        assertThat(render(Map.of()), is(BASE + "\""));
+        assertThat(render(Map.of()), is(BASE));
     }
 
     @Test
@@ -39,7 +39,7 @@ class TelegramTemplateCustomFieldsTest {
         var fields = new HashMap<String, Object>();
         fields.put("owner", null);
 
-        assertThat(render(Map.of("customMessage", "", "customFields", fields)), is(BASE + "\n\nowner: -\""));
+        assertThat(render(Map.of("customMessage", "", "customFields", fields)), is(BASE + "\n\nowner: -"));
     }
 
     @Test
@@ -52,7 +52,7 @@ class TelegramTemplateCustomFieldsTest {
         var text = render(Map.of("customMessage", "m".repeat(5000), "customFields", fields));
 
         assertThat(text.length(), lessThanOrEqualTo(4096));
-        assertThat(text, endsWith("...\""));
+        assertThat(text, endsWith("..."));
     }
 
     private String render(Map<String, Object> custom) throws Exception {
