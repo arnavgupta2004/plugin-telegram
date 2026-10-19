@@ -9,7 +9,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 import io.kestra.core.junit.annotations.KestraTest;
-import io.kestra.core.runners.VariableRenderer;
+import io.kestra.core.runners.RunContextFactory;
 
 import jakarta.inject.Inject;
 
@@ -27,7 +27,7 @@ class TelegramTemplateCustomFieldsTest {
     private static final String BASE = "\"<company.team flow exec-id ➛ FAILED - Final task ID ➛ failed> Failed on task `failed` after PT1S (https://kestra.example/link)";
 
     @Inject
-    private VariableRenderer variableRenderer;
+    private RunContextFactory runContextFactory;
 
     @Test
     void withoutCustomMessageOrFields_messageIsUnchanged() throws Exception {
@@ -36,7 +36,7 @@ class TelegramTemplateCustomFieldsTest {
 
     @Test
     void emptyCustomMessage_andNullFieldValue() throws Exception {
-        Map<String, Object> fields = new HashMap<>();
+        var fields = new HashMap<String, Object>();
         fields.put("owner", null);
 
         assertThat(render(Map.of("customMessage", "", "customFields", fields)), is(BASE + "\n\nowner: -\""));
@@ -44,7 +44,7 @@ class TelegramTemplateCustomFieldsTest {
 
     @Test
     void longCustomContent_staysWithinTelegramMessageLimit() throws Exception {
-        Map<String, Object> fields = new LinkedHashMap<>();
+        var fields = new LinkedHashMap<String, Object>();
         for (int i = 1; i <= 50; i++) {
             fields.put("field" + i, "v".repeat(500));
         }
@@ -60,7 +60,7 @@ class TelegramTemplateCustomFieldsTest {
             Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("telegram-template.peb")).readAllBytes(),
             StandardCharsets.UTF_8
         );
-        Map<String, Object> variables = new HashMap<>(Map.of(
+        var variables = new HashMap<String, Object>(Map.of(
             "execution", Map.of("id", "exec-id", "namespace", "company.team", "flowId", "flow", "state", Map.of("current", "FAILED")),
             "lastTask", Map.of("taskId", "failed"),
             "firstFailed", Map.of("taskId", "failed"),
@@ -68,6 +68,7 @@ class TelegramTemplateCustomFieldsTest {
             "link", "https://kestra.example/link"
         ));
         variables.putAll(custom);
-        return variableRenderer.render(template, variables);
+        // Same call as TelegramTemplate.run
+        return runContextFactory.of().render(template, variables);
     }
 }
