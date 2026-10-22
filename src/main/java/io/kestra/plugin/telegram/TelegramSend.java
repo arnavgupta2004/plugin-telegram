@@ -153,7 +153,7 @@ public class TelegramSend extends AbstractTelegramConnection {
         try (HttpClient httpClient = new HttpClient(runContext, super.httpClientConfigurationWithOptions())) {
             String rDestination = runContext.render(this.channel).as(String.class).orElseThrow();
             String rApiToken = runContext.render(this.token).as(String.class).orElseThrow();
-            String rParseMode = renderParseMode(runContext).map(ParseMode::getValue).orElse(null);
+            var rParseMode = renderParseMode(runContext).map(ParseMode::getValue).orElse(null);
             if (this.from != null) {
                 var rFrom = runContext.render(this.from).as(String.class)
                     .filter(value -> !value.isBlank())

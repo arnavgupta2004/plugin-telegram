@@ -65,7 +65,9 @@ public class TelegramExecution extends TelegramTemplate implements ExecutionInte
         title = "Custom fields",
         description = """
             Added to the message as one `key: value` line each, after the `customMessage` if it is set. \
-            Telegram limits a message to 4096 characters, so a longer message is shortened and ends with `...`."""
+            Sent as plain text: with `parseMode`, keys and values are escaped for that mode, so markup in them is \
+            shown as written, not interpreted. Telegram limits a message to 4096 characters, so a longer message is \
+            shortened and ends with `...`."""
     )
     @PluginProperty(group = "destination")
     private Property<Map<String, Object>> customFields;
@@ -73,7 +75,9 @@ public class TelegramExecution extends TelegramTemplate implements ExecutionInte
         title = "Custom message",
         description = """
             Added to the message after the execution summary, separated by a blank line. \
-            Telegram limits a message to 4096 characters, so a longer message is shortened and ends with `...`."""
+            Sent as plain text: with `parseMode`, it is escaped for that mode, so markup such as `<b>` or `*bold*` is \
+            shown as written, not interpreted. Telegram limits a message to 4096 characters, so a longer message is \
+            shortened and ends with `...`."""
     )
     @PluginProperty(group = "destination")
     private Property<String> customMessage;
