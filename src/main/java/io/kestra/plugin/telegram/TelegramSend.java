@@ -194,6 +194,8 @@ public class TelegramSend extends AbstractTelegramConnection {
     }
 
     protected Optional<ParseMode> renderParseMode(RunContext runContext) throws IllegalVariableEvaluationException {
+        // Not render(...).as(ParseMode.class): it parses the value as JSON and fails before ParseMode.fromString,
+        // hiding the case-sensitive error message.
         return this.parseMode != null
             ? Optional.ofNullable(runContext.render(this.parseMode.toString())).map(ParseMode::fromString)
             : Optional.empty();
